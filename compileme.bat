@@ -1,2 +1,2 @@
-javac -cp .;./jar/lwjgl.jar -d ./bin src/com/JAsteroids/Runner.java
+javac -cp .;./jar/lwjgl.jar;./jar/slick.jar -d ./bin src/com/JAsteroids/*.java src/com/JAsteroids/Gui/*.java src/com/JAsteroids/LevelStuff/*.java
 pause
