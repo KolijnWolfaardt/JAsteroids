@@ -1,7 +1,10 @@
 package com.JAsteroids;
 
+import java.util.Arrays;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.*;
+import java.lang.reflect.Field;
 
  
 public class Runner
@@ -13,6 +16,8 @@ public class Runner
 	 
 	public void start()
 	{
+		
+		
 		//TODO : Read Langauge from file
 		currentSettings = new Settings();
 		currentSettings.readFromFile("options.txt");
@@ -66,8 +71,6 @@ public class Runner
 			Display.update();
 			Display.sync(120);
 		}
-
-		
 		Display.destroy();
 	}
 	
@@ -87,14 +90,49 @@ public class Runner
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
+	
+	public static void addLibraryPath(String pathToAdd) throws Exception
+	{
+		final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
+		usrPathsField.setAccessible(true);
 
+		//get array of paths
+		final String[] paths = (String[])usrPathsField.get(null);
+
+		//check if the path to add is already present
+		for(String path : paths)
+		{
+			if(path.equals(pathToAdd))
+			{
+				return;
+			}
+		}
+
+		//add the new path
+		final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
+		newPaths[newPaths.length-1] = pathToAdd;
+		usrPathsField.set(null, newPaths);
+	}
 	 
 	public static void main(String[] argv)
-	{
+	{	
+		//System.setProperty("java.class.path",System.getProperty("java.class.path")+";"+System.getProperty("java.class.path")+"\\jar\\lwjgl.jar");
+		//System.setProperty("java.class.path",System.getProperty("java.class.path")+";"+System.getProperty("user.dir")+"\\jar\\lwjgl.jar;"+System.getProperty("user.dir")+"\\jar\\slick.jar");
+		//System.out.println(System.getProperty("java.class.path"));		
+		//System.out.println(System.getProperty("user.dir"));
+		try
+		{
+			Runner.addLibraryPath("./native/windows");
+		} catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			System.out.println("Failed to fin lwjgl natives. Run with -Djava.library.path=(Path to natives) in the command line");
+			e.printStackTrace();
+		}
 		Runner displayExample = new Runner();
 		displayExample.start();
 	}
-	
+	 
 	/*
 	 	
 	

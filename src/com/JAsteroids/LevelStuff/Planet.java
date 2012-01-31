@@ -13,7 +13,7 @@ public class Planet
 	public int h = 150;
 	public int planetTexNum;
 	public float weight = 10000.0f;
-	public int orbitDistance = 600;
+	public int orbitDistance = 700;
 	public float orbitAngle = 0.0f;
 	
 	public Planet (int newX, int newY)

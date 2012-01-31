@@ -13,6 +13,10 @@ public class TextureManager
 	public static Texture[] planets = new Texture[1];
 	public static Texture[] suns = new Texture[1];
 	
+	public static Texture[] backgrounds = new Texture[1];
+	
+	public static Texture[] enemies = new Texture[1];
+	
 	public static void loadTextures()
 	{
 		try
@@ -22,10 +26,23 @@ public class TextureManager
 			
 			TextureManager.suns[0] = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("images/game/Sun.png"));
 			
-		} catch (IOException e)
+			TextureManager.backgrounds[0] = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("images/game/Stars1.png"));
+			
+			TextureManager.enemies[0] = TextureLoader.getTexture("PNG",ResourceLoader.getResourceAsStream("images/game/enemies/enemy1.png"));
+		} 
+		catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static void freeTextures()
+	{
+		TextureManager.playership.release();
+		TextureManager.planets[0].release();
+		TextureManager.suns[0].release();
+		TextureManager.backgrounds[0].release();
+		TextureManager.enemies[0].release();
 	}
 }
