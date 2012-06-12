@@ -4,26 +4,32 @@ import java.util.Arrays;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.*;
+
+import com.JAsteroids.LevelStuff.*;
+import com.JAsteroids.Render.*;
+
 import java.lang.reflect.Field;
 
  
 public class Runner
 {
-	//Texture planet;
-	int gameState = 1;
+	int gameState = 0;	//0 is the first game state
+	int newGameState = 0;
+	
 	Language stringLookup = new Language();
 	Settings currentSettings;
 	 
-	public void start()
-	{
-		
-		
+	public void start(String[] args)
+	{		
 		//TODO : Read Langauge from file
+		//TODO : Check Command Line arguments
+		
 		currentSettings = new Settings();
 		currentSettings.readFromFile("options.txt");
 		
 		try
 		{
+			//TODO make resolution read from file
 			Display.setDisplayMode(new DisplayMode(800,600));
 			Display.create();
 			GLInit();
@@ -34,38 +40,59 @@ public class Runner
 			e.printStackTrace();
 			System.exit(0);
 		}
+		
+		DrawerType[] drawers = new DrawerType[6];
 	 
-		MenuClass atTheMenu = new MenuClass(currentSettings,stringLookup);
-		LevelClass atTheLevel =	null;
-		int newGameState = 1;
+		drawers[0] = new DrawerMenu(currentSettings,stringLookup);
+		drawers[5] = new DrawerLevel();
 		
 		
-		while (!Display.isCloseRequested() && gameState != 0)
+		
+		while (!Display.isCloseRequested() && gameState != -1)
 		{ 
 			GL11.glClearColor(0.0f,0.0f,0.0f,1.0f);
-			switch(gameState)
+			newGameState = drawers[gameState].render();
+			
+			/*
+			 * How this works:
+			 * 
+			 * Every Frame, the drawer's render() method is called. This returns a value, indicating which
+			 * state the game must move to next. To correspond with the array of drawers, values from 0 
+			 * upwards indicate different states in the game. A -1 indicates a quit, and a -2 indicates no
+			 * change.
+			 * 
+			 * 
+			 *  0 - menu
+			 *  1 - settings
+			 *  2 - load Game 
+			 *  3 -
+			 *  4 - 
+			 *  5 - NewLevel
+			 *  
+			 *  How are levelNames, etc going to be passed around?
+			 */
+			
+			if (newGameState  >= 0)
 			{
-				case 1:  newGameState = atTheMenu.render();	break;
-				case 5: newGameState = atTheLevel.render(); break;
-				//2 - settings
-				//3 - reserved
-				//4 - reserved
-				//5 - game
+				System.out.println("Change from "+gameState+" to " + newGameState);
+				/*
+				 * Levels in use:
+				 * 1 - Menu
+				 * 5 - New Game
+				 */
+				//If There has been a change in gameState
+				if ((newGameState != gameState) && (newGameState >0))
+				{
+					drawers[gameState].end();
+					drawers[newGameState].begin();
+				}
+
+				gameState = newGameState;
 			}
 			
-			switch (newGameState)
+			if (newGameState == -1)
 			{
-			//0 means no change
-				case 5: 
-					atTheMenu.endClass(); 
-					atTheMenu = null; 
-					atTheLevel=new LevelClass();
-				break;
-			}
-			if (newGameState != 0)
-			{
-				gameState = newGameState;
-				newGameState = 0;
+				drawers[gameState].end();
 			}
 			
 			Display.update();
@@ -114,7 +141,7 @@ public class Runner
 		usrPathsField.set(null, newPaths);
 	}
 	 
-	public static void main(String[] argv)
+	public static void main(String[] args)
 	{	
 		//System.setProperty("java.class.path",System.getProperty("java.class.path")+";"+System.getProperty("java.class.path")+"\\jar\\lwjgl.jar");
 		//System.setProperty("java.class.path",System.getProperty("java.class.path")+";"+System.getProperty("user.dir")+"\\jar\\lwjgl.jar;"+System.getProperty("user.dir")+"\\jar\\slick.jar");
@@ -130,7 +157,7 @@ public class Runner
 			e.printStackTrace();
 		}
 		Runner displayExample = new Runner();
-		displayExample.start();
+		displayExample.start(args);
 	}
 	 
 	/*

@@ -16,6 +16,7 @@ public class TextureManager
 	public static Texture[] backgrounds = new Texture[1];
 	
 	public static Texture[] enemies = new Texture[1];
+	public static Texture[] bullets = new Texture[1];
 	
 	public static void loadTextures()
 	{
@@ -29,6 +30,8 @@ public class TextureManager
 			TextureManager.backgrounds[0] = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("images/game/Stars1.png"));
 			
 			TextureManager.enemies[0] = TextureLoader.getTexture("PNG",ResourceLoader.getResourceAsStream("images/game/enemies/enemy1.png"));
+			
+			TextureManager.bullets[0] = TextureLoader.getTexture("PNG",ResourceLoader.getResourceAsStream("images/game/bullets/bullet0.png"));
 		} 
 		catch (IOException e)
 		{

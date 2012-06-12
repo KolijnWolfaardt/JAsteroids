@@ -7,8 +7,8 @@ import com.JAsteroids.TextureManager;
 public class Enemy
 {
 	int textureID = 0;
-	public float enemyX;
-	public float enemyY;
+	public float enemyX = 100;
+	public float enemyY = 200;
 	
 	public float rotX = 1;
 	public float rotY = 0;
