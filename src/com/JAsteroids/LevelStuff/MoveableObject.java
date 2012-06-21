@@ -82,7 +82,7 @@ public class MoveableObject
 				//	| cos(t)  - sin(t) |
 				// | sin(t)    cos(t) |
 				
-				PointsThisObject[i] = new Vector2f(this.X+(this.collisionPoints[i].x*this.rotX - this.collisionPoints[i].y*this.rotY),this.Y+(this.collisionPoints[i].x*this.rotY+this.collisionPoints[i].y*this.rotX));
+				PointsThisObject[i] = new Vector2f(this.X+(this.collisionPoints[i].x*this.rotX + this.collisionPoints[i].y*this.rotY),this.Y+(-this.collisionPoints[i].x*this.rotY + this.collisionPoints[i].y*this.rotX));
 				System.out.println(PointsThisObject[i]);
 			}
 			
@@ -137,6 +137,7 @@ public class MoveableObject
 				else
 				{
 					collisions +=1;
+					System.out.println("Collision Detected on this side");
 					
 				}
 				System.out.print("\n");
