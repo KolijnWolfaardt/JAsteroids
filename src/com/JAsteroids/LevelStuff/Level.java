@@ -14,6 +14,13 @@ import org.newdawn.slick.util.ResourceLoader;
 import com.JAsteroids.*;
 import com.JAsteroids.LevelStuff.*;
 
+
+/*
+ * Standards: right: positive X
+ * 				up: positive Y
+ * 				angles, measured clockwise from positive X
+ * 
+ */
 public class Level
 {
 	//Needs a list of planets
@@ -22,6 +29,8 @@ public class Level
 	Texture background;
 	public Planet[] planets = new Planet[20];
 	Enemy[] enemies = new Enemy[20];
+	Player player = new Player();
+	
 	
 	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	public Sun theSun;
@@ -30,20 +39,7 @@ public class Level
 	//Regarding the player
 	public int numPlanets = 1;
 	public int numEnemies = 1;
-	
-	public float playerX;
-	public float playerY;
-	public float rotX = 1;
-	public float rotY = 0;
-	public float goalRotationX = 0.0f;
-	public float goalRotationY = 0.0f;
-	public float playerXSpeed;
-	public float playerYSpeed;
-	public int gunRecharge = 30;
-	public int gunType = 0;
-	
-	public float BoosterLeft = 100;
-	
+		
 	public int backgroundNum = 0;
 	
 	public float mass = 100.0f;
@@ -56,8 +52,11 @@ public class Level
 	
 	public Level()
 	{
-		playerX = 400;
-		playerY = 0;
+		player.X = 400;
+		player.Y = 300;
+		player.width =24;
+		player.height = 24;
+		player.r = JAsteroidsUtil.distance(player.width, player.height);
 		
 		try
 		{
@@ -71,6 +70,11 @@ public class Level
 		
 		//Create enemies
 		enemies[0] = new Enemy();
+		enemies[0].Y = 200;
+		enemies[0].X = 100;
+		enemies[0].width = 24;
+		enemies[0].height = 24;
+		enemies[0].r = JAsteroidsUtil.distance(enemies[0].width, enemies[0].height);
 		
 		//Create planets
 		planets[0] = new Planet(700,-80);
@@ -82,127 +86,146 @@ public class Level
 
 	public void update()
 	{
-		float mouseDX = 400-Mouse.getX();
-		float mouseDY = 600-Mouse.getY()-300;
+		float mouseDX = (Mouse.getX()-400);
+		float mouseDY = (Mouse.getY()-300);
 		
 		float dist = (float) Math.sqrt(mouseDX*mouseDX + mouseDY*mouseDY);
 		
-		goalRotationX = -mouseDX/dist;
-		goalRotationY = -mouseDY/dist;
+		player.goalRotationX = mouseDX/dist;
+		player.goalRotationY = mouseDY/dist;
 	
 		
 		if (!Mouse.isButtonDown(1))
 		{
-			rotX +=(goalRotationX-rotX)*0.05;
-		rotY +=(goalRotationY-rotY)*0.05;
+			player.rotX +=(player.goalRotationX-player.rotX)*0.05;
+			player.rotY +=(player.goalRotationY-player.rotY)*0.05;
 		}
-		/*
-		 goalRotationX = (float) Math.atan2(400-Mouse.getX(), 600-Mouse.getY()-300);
-		
-		 
-		 if ((rotation-goalRotationX)%(Math.PI*2)> 0.1f)
-			 rotation-=0.08f;
-		 else if ((rotation-goalRotationX)%(Math.PI*2) < -0.1f)
-			 rotation +=0.08f;*/
-		 
-		 //Display.setTitle("ROT :" +rotation+"\tGROT :"+goalRotationX +"\tAdd :"+(rotation-goalRotationX)%(2*Math.PI));
-		 
-		 //rotation = goalRotation;
-		
-		if (Mouse.isButtonDown(0) && gunRecharge>=10)
+
+		if (Mouse.isButtonDown(0) && player.gunRecharge>=30)
 		{
 			//FIRE!
-			Bullet newB = new Bullet(gunType,playerX,playerY,rotX,rotY);
+			Bullet newB = new Bullet(player.gunType,player.X,player.Y,player.rotX,player.rotY);
 			bullets.add(newB);
-			gunRecharge = 0;	
+			player.gunRecharge = 0;	
 		}
 		
-		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) && BoosterLeft > 0)
+		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) && player.boosterLeft > 0)
 		{
-			BoosterLeft--;
-			if (distance(playerXSpeed,playerYSpeed) <6.0f)
+			player.boosterLeft-=2;
+			if (distance(player.speedX,player.speedY) <6.0f)
 			{
 				//Add to both, in balance
-				playerXSpeed += rotX*0.08f;
-				playerYSpeed -= rotY*0.08f;
+				player.speedX += player.rotX*0.08f;
+				player.speedY -= player.rotY*0.08f;
+			}
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+		{
+			player.Y +=1;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_UP))
+		{
+			player.Y -=1;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
+		{
+			player.X -=1;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
+		{
+			player.X +=1;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_C)) // Do collision checking
+		{
+			for ( int e =0;e<numEnemies;e++)
+			{
+				
+				if (player.checkCollision(enemies[e]) == true)
+				{
+					System.out.println("Collision");
+					player.speedX = - player.speedX*0.4f;
+					player.speedY = - player.speedY*0.4f;
+				}
 			}
 		}
 		
 
-		playerX+=playerXSpeed;
-		playerY+=playerYSpeed;
+		player.X+=player.speedX;
+		player.Y+=player.speedY;
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) )
 		{
-			if (distance(playerXSpeed,playerYSpeed) >2.5f)
+			if (JAsteroidsUtil.distance(player.speedX,player.speedY) >2.5f)
 			{
-				if (playerXSpeed>0.03)
+				if (player.speedX>0.03)
 				{
-					playerXSpeed-=0.05;
+					player.speedX-=0.05;
 				}
-				if (playerXSpeed<-0.03)
+				if (player.speedX<-0.03)
 				{
-					playerXSpeed+=0.05;
+					player.speedX+=0.05;
 				}
 				
-				if (playerYSpeed>0.03)
+				if (player.speedY>0.03)
 				{
-					playerYSpeed-=0.05;
+					player.speedY-=0.05;
 				}
-				if (playerYSpeed<-0.03)
+				if (player.speedY<-0.03)
 				{
-					playerYSpeed+=0.05;
+					player.speedY+=0.05;
 				}
 			}
-			if (distance(playerXSpeed,playerYSpeed) <2.5f)
+			if (JAsteroidsUtil.distance(player.speedX,player.speedY) <2.5f)
 			{
-				if (playerXSpeed>0.01)
+				if (player.speedX>0.01)
 				{
-					playerXSpeed-=0.03;
+					player.speedX-=0.03;
 				}
-				if (playerXSpeed<-0.01)
+				if (player.speedX<-0.01)
 				{
-					playerXSpeed+=0.03;
+					player.speedX+=0.03;
 				}
 				
-				if (playerYSpeed>0.01)
+				if (player.speedY>0.01)
 				{
-					playerYSpeed-=0.03;
+					player.speedY-=0.03;
 				}
-				if (playerYSpeed<-0.01)
+				if (player.speedY<-0.01)
 				{
-					playerYSpeed+=0.03;
+					player.speedY+=0.03;
 				}
 			}
 		}
 		
+		
+		
 		//Do the influence of the planets
 		
-		for (int i = 0;i<1;i++)
+		/*for (int i = 0;i<1;i++)
 		{
-			float planetDist = distance(playerX-planets[i].x,playerY-planets[i].y);
+			float planetDist = JAsteroidsUtil.distance(player.X-planets[i].x,player.Y-planets[i].y);
 			
 			if (planetDist < 3000)
 			{
 				float F =planets[i].weight/planetDist;
-				float angle = (float) Math.atan2(playerX-planets[i].x, playerY-planets[i].y);
+				float angle = (float) Math.atan2(player.X-planets[i].x, player.Y-planets[i].y);
 				
-				playerXSpeed -= (float) (Math.sin(angle)*planetInfluence*F);
-				playerYSpeed -= (float) (Math.cos(angle)*planetInfluence*F);
+				player.speedX -= (float) (Math.sin(angle)*planetInfluence*F);
+				player.speedY -= (float) (Math.cos(angle)*planetInfluence*F);
 			}
 		}
 		
 		//Influence of the sun
-		float sunDist = distance(playerX-theSun.x,playerY-theSun.y);
+		float sunDist = distance(player.X-theSun.x,player.Y-theSun.y);
 		
 		if (sunDist < 1400 && sunDist>20)//A minimum distance. By now a collision should have happened
 		{
 			float F = theSun.weight/sunDist;
-			float angle = (float) Math.atan2(playerX-theSun.x, playerY-theSun.y);
+			float angle = (float) Math.atan2(player.X-theSun.x, player.Y-theSun.y);
 			
-			playerXSpeed -= (float) (Math.sin(angle)*planetInfluence*F);
-			playerYSpeed -= (float) (Math.cos(angle)*planetInfluence*F);
-		}
+			player.speedX -= (float) (Math.sin(angle)*planetInfluence*F);
+			player.speedY -= (float) (Math.cos(angle)*planetInfluence*F);
+		}*/
 		
 		//Update Bullets
 		for (int i = 0 ; i < bullets.size();i++)
@@ -224,16 +247,36 @@ public class Level
 			planets[i].y = (int) (Math.cos(planets[i].orbitAngle)*planets[i].orbitDistance);
 		}
 		
-		if (BoosterLeft < 100)
+		if (player.boosterLeft < player.boosterMax)
 		{
-			BoosterLeft+=5;
+			player.boosterLeft++;
 		}
 		//Display.setTitle("BoosterLeft :"+BoosterLeft);
 		
-		if (gunRecharge<10)
+		if (player.gunRecharge<30)
 		{
-			gunRecharge++;
+			player.gunRecharge++;
 		}
+		
+		
+		
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////      Collision Checking      //////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		//Player with enemies
+		/*for ( int e =0;e<numEnemies;e++)
+		{
+			
+			if (player.checkCollision(enemies[e]) == true)
+			{
+				System.out.println("Collision");
+				player.speedX = - player.speedX*0.4f;
+				player.speedY = - player.speedY*0.4f;
+			}
+		}*/
+		
 	}
 	
 	public static float distance(float a, float b)
@@ -248,50 +291,69 @@ public class Level
 	 */
 	public void render()
 	{
-		int xMax = (int) (playerX+600);
-		int xMin = (int) (playerY-600);
-		
-		int yMax = (int) (playerY+400);
-		int yMin = (int) (playerY-400);
-		
-		int offsetX = (int) (400-playerX);
-		int offsetY = (int) (300-playerY);
-		Display.setTitle("OffX"+offsetX+"\tOffy"+offsetY);
+		//First, determine the top left corner
+		int cornerX = (int) (player.X - 400);
+		int cornerY = (int) (player.Y - 300);
 		
 		
-		//Render Background
-		int pos1= 255- (int) (playerX%255);
-		int pos2= 255- (int) (playerY%255);
+		Display.setTitle("X : "+cornerX +"\tY :" + cornerY + "\trotX"+player.rotX+"\trotY"+player.rotY);
 		
-		for (int i = -3;i<3;i++)
+		/*
+		 * First render the background. To do this, calculate how much of each tile is sticking out 
+		 * on the left of the sceen. Then subtract another 255 to be sure we start drawing outside 
+		 * the screen. The negative
+		 * 0-------255---------------------------------------------------->
+		 * |'-.                     
+		 * |    '-.           
+		 255        '-.______________ 
+		 * |        |   '-.     Tile |
+		 * |        |       '-.____________________________________
+		 * |        |         | CornerX,Y                          |
+		 * |        |_________|                                    |
+		 * |             a    |                                    |
+		 * |                  |						visible screen      |
+		 * |                  |                                    |
+		 * |
+		 * |	a - distance one tile overlaps
+		 * |
+		 * Y
+		 */
+		int backgroundStartX= -(cornerX%255) -255;
+		int backgroundStartY= -(cornerY%255) -255;
+		
+		
+		for (int i = 0;i<6;i++)
 		{
-			for (int j = -3;j<3;j++)
+			for (int j = 0;j<5;j++)
 			{	
-				RenderBackground(backgroundNum,pos1+i*255,pos2+j*255);
+				RenderBackground(backgroundNum,backgroundStartX+ i*255, backgroundStartY+ j*255);
 			}
 		}
 		
-		//Render Sun
-		theSun.render(offsetX,offsetY);
+		
+		/*
+		 * Draw the sun
+		 */
+		theSun.render(cornerX,cornerY);
 
 		
 		//Render Planets
 		for (int i =0;i<numPlanets;i++)
 		{
-			planets[i].render(offsetX,offsetY);
+			planets[i].render(cornerX,cornerY);
 		}
 		
 		//Render Bullets
 		for (int i = 0;i<bullets.size();i++)
 		{
-			bullets.get(i).render(offsetX,offsetY);
+			bullets.get(i).render(cornerX,cornerY);
 		}
 		
 		
 		//Render Enemies
 		for (int i = 0; i<numEnemies; i++)
 		{
-			enemies[i].render(offsetX,offsetY);
+			enemies[i].render(cornerX,cornerY);
 		}
 		
 		//Render PLayer		
@@ -299,7 +361,7 @@ public class Level
 		//Draw a quad in the centre of the screen
 		GL11.glPushMatrix();
 		GL11.glTranslatef(400, 300, 0);
-		GL11.glRotatef((float) Math.toDegrees(Math.atan2(rotX,rotY)), 0f, 0f, 1f);
+		GL11.glRotatef((float) Math.toDegrees(Math.atan2(player.rotY,player.rotX)), 0f, 0f, -1f);
 		GL11.glTranslatef(-400, -300, 0);
 		
 			GL11.glBegin(GL11.GL_QUADS);

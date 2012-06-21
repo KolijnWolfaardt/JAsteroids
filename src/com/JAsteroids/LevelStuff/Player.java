@@ -1,5 +1,7 @@
 package com.JAsteroids.LevelStuff;
 
+import com.JAsteroids.Vector2f;
+
 public class Player extends MoveableObject
 {
 
@@ -15,6 +17,12 @@ public class Player extends MoveableObject
 	public Player()
 	{
 		super();
+		
+		//Set collision points
+		collisionPoints = new Vector2f[3];	//Actually in the form of a triangle
+		collisionPoints[0] = new Vector2f(-24,-24);
+		collisionPoints[1] = new Vector2f(24,0);
+		collisionPoints[2] = new Vector2f(-24,24);
 	}
 	
 	public int update()

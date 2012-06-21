@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.*;
 
+import com.JAsteroids.*;
 import com.JAsteroids.LevelStuff.*;
 import com.JAsteroids.Render.*;
 
@@ -16,7 +17,7 @@ public class Runner
 	int gameState = 0;	//0 is the first game state
 	int newGameState = 0;
 	
-	Language stringLookup = new Language();
+	Language stringLookup = new Language ();
 	Settings currentSettings;
 	 
 	public void start(String[] args)

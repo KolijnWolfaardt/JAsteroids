@@ -8,8 +8,8 @@ public class Bullet extends MoveableObject
 {
 	public int bulletTexNum = 0;
 	
-	public float BulletX;
-	public float BulletY;
+	public float X;
+	public float Y;
 	public float rotX = 1.0f;
 	public float rotY = 0.0f;
 	public float speedX = 0;
@@ -23,9 +23,6 @@ public class Bullet extends MoveableObject
 	public boolean gravity = false; //Affected by gravity
 	public float distance = 0;
 	
-	int w = 16;
-	int h = 16;
-	
 	public Bullet()
 	{
 	}
@@ -34,20 +31,23 @@ public class Bullet extends MoveableObject
 	{
 		bulletTexNum=bulletType;
 		
-		BulletX = x;
-		BulletY = y;
+		X = x;
+		Y = y;
 		
 		rotX = rotx;
 		rotY = roty;
 		
 		speedX = baseSpeed*rotx;
 		speedY = baseSpeed*roty;
+		
+		width = 16;
+		height = 16;
 	}
 	
 	public int update ()
 	{
-		BulletX+=speedX;
-		BulletY-=speedY;
+		X+=speedX;
+		Y-=speedY;
 		distance+= Math.sqrt((speedX*speedX)+ (speedY*speedY));
 		if (distance > 3500)
 			return 1;
@@ -61,25 +61,25 @@ public class Bullet extends MoveableObject
 
 
 		GL11.glPushMatrix();
-		GL11.glTranslatef(BulletX+xpos, BulletY+ypos, 0);
+		GL11.glTranslatef((X-xpos), (Y-ypos), 0);
 		GL11.glRotatef((float) Math.toDegrees(Math.atan2(rotX,rotY)), 0f, 0f, 1f);
-		GL11.glTranslatef(-BulletX-xpos, -BulletY-ypos, 0);
+		GL11.glTranslatef(-(X-xpos), -(Y-ypos), 0);
 		
 			
 		
 			GL11.glBegin(GL11.GL_QUADS);
 				
 			GL11.glTexCoord2f(0.0f,0.0f);
-			GL11.glVertex2f(BulletX+xpos-w, BulletY+ypos-h);
+			GL11.glVertex2f((X-xpos)-width, (Y-ypos)-height);
 			
 			GL11.glTexCoord2f(TextureManager.bullets[bulletTexNum].getWidth(),0.0f);
-			GL11.glVertex2f(BulletX+xpos+w, BulletY+ypos-h);
+			GL11.glVertex2f((X-xpos)+width, (Y-ypos)-height);
 			
 			GL11.glTexCoord2f(TextureManager.bullets[bulletTexNum].getWidth(),TextureManager.bullets[bulletTexNum].getHeight());
-			GL11.glVertex2f(BulletX+xpos+w, BulletY+ypos+h);
+			GL11.glVertex2f((X-xpos)+width, (Y-ypos)+height);
 			
 			GL11.glTexCoord2f(0.0f,TextureManager.bullets[bulletTexNum].getHeight());
-			GL11.glVertex2f(BulletX+xpos-w, BulletY+ypos+h);
+			GL11.glVertex2f((X-xpos)-width, (Y-ypos)+height);
 				
 			GL11.glEnd();	
 		

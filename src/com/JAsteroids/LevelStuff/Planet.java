@@ -29,16 +29,16 @@ public class Planet
 			GL11.glBegin(GL11.GL_QUADS);
 			
 			GL11.glTexCoord2f(0.0f,0.0f);
-			GL11.glVertex2f(x+xpos-w, y+ypos-h);
+			GL11.glVertex2f((x-xpos)-w, (y-ypos)-h);
 			
 			GL11.glTexCoord2f(TextureManager.planets[planetTexNum].getWidth(),0.0f);
-			GL11.glVertex2f(x+xpos+w, y+ypos-h);
+			GL11.glVertex2f((x-xpos)+w, (y-ypos)-h);
 			
 			GL11.glTexCoord2f(TextureManager.planets[planetTexNum].getWidth(),TextureManager.planets[planetTexNum].getHeight());
-			GL11.glVertex2f(x+xpos+w, y+ypos+h);
+			GL11.glVertex2f((x-xpos)+w, (y-ypos)+h);
 			
 			GL11.glTexCoord2f(0.0f,TextureManager.planets[planetTexNum].getHeight());
-			GL11.glVertex2f(x+xpos-w, y+ypos+h);	
+			GL11.glVertex2f((x-xpos)-w, (y-ypos)+h);	
 		
 		GL11.glEnd();
 	}
