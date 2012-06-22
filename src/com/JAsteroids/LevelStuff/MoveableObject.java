@@ -30,6 +30,9 @@ public class MoveableObject
 	public float width;
 	public float height;
 	public float r;
+	
+	public int health = 100; //Default is 100
+	
 	public Vector2f[] collisionPoints; 
 	//Every object need a bounding box.
 	//Maybe introduce a Vector class?
@@ -62,11 +65,8 @@ public class MoveableObject
 			return false;
 		}
 		else
-		{
-			System.out.println("\n");
-			
+		{			
 			//Take the first vector of the first object
-			
 			Vector2f PointsThisObject[] = new Vector2f[this.collisionPoints.length];
 			Vector2f PointsOtherObject[] = new Vector2f[a.collisionPoints.length];
 			
@@ -83,21 +83,18 @@ public class MoveableObject
 				// | sin(t)    cos(t) |
 				
 				PointsThisObject[i] = new Vector2f(this.X+(this.collisionPoints[i].x*this.rotX + this.collisionPoints[i].y*this.rotY),this.Y+(-this.collisionPoints[i].x*this.rotY + this.collisionPoints[i].y*this.rotX));
-				System.out.println(PointsThisObject[i]);
 			}
 			
 			//Construct vectors for the other object
 			for(int i =0;i<a.collisionPoints.length;i++)
 			{
 				PointsOtherObject[i] = new Vector2f(a.X+a.collisionPoints[i].x,a.Y+a.collisionPoints[i].y);
-				System.out.println("PointsOtherObject["+i+"]"+PointsOtherObject[i]);
 			}
 			
 			
 			//For each of the points on this object:
 			for (int i = 0; i<this.collisionPoints.length; i++)
 			{
-				System.out.println("Side +1");
 				Vector2f grad;
 				//Determine the gradient
 				if (i+1 == this.collisionPoints.length) 
@@ -110,7 +107,6 @@ public class MoveableObject
 					//If it is the last i, use the first point again
 					grad = Vector2f.gradientNegative(PointsThisObject[i],PointsThisObject[i+1]);
 				}
-				System.out.println("\t grad "+grad);
 				
 				float myComponents[] = new float[this.collisionPoints.length];
 				float hisComponents[] = new float[a.collisionPoints.length];
@@ -119,16 +115,13 @@ public class MoveableObject
 				for (int j =0; j< this.collisionPoints.length;j++)
 				{
 					myComponents[j] = Vector2f.component(PointsThisObject[j],grad);
-					System.out.println("\t MyComponent "+j+" "+myComponents[j] );
 				}
 				
 				for (int j =0; j< a.collisionPoints.length;j++)
 				{
 					hisComponents[j] = Vector2f.component(PointsOtherObject[j],grad);
-					System.out.println("\t HisComponent "+j+" "+hisComponents[j] );
 				}
 				
-				System.out.print("Comparing....");
 				
 				if ((JAsteroidsUtil.max(myComponents) < JAsteroidsUtil.min(hisComponents)) || (JAsteroidsUtil.min(myComponents) > JAsteroidsUtil.max(hisComponents)))
 				{
@@ -137,10 +130,8 @@ public class MoveableObject
 				else
 				{
 					collisions +=1;
-					System.out.println("Collision Detected on this side");
 					
 				}
-				System.out.print("\n");
 			}
 			
 			if (collisions == this.collisionPoints.length)

@@ -12,7 +12,6 @@ import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import com.JAsteroids.*;
-import com.JAsteroids.LevelStuff.*;
 
 
 /*
@@ -26,27 +25,22 @@ public class Level
 	//Needs a list of planets
 	//Needs a sun
 	//List of enemies
-	Texture background;
-	public Planet[] planets = new Planet[20];
-	Enemy[] enemies = new Enemy[20];
+	
 	Player player = new Player();
 	
-	
+	Texture background;
+	public Planet[] planets = new Planet[20];	
+	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	
+	
 	public Sun theSun;
-	
-	
-	//Regarding the player
 	public int numPlanets = 1;
-	public int numEnemies = 1;
-		
 	public int backgroundNum = 0;
-	
 	public float mass = 100.0f;
-	
 	public float planetInfluence = 0.0001f;
 	
-
+	int score = 0;
 	
 	//VariableChanger varWindow;
 	
@@ -69,19 +63,12 @@ public class Level
 		}
 		
 		//Create enemies
-		enemies[0] = new Enemy();
-		enemies[0].Y = 200;
-		enemies[0].X = 100;
-		enemies[0].width = 24;
-		enemies[0].height = 24;
-		enemies[0].r = JAsteroidsUtil.distance(enemies[0].width, enemies[0].height);
+		Enemy a = Enemy.newEnemy(0);
+		enemies.add(a);
 		
 		//Create planets
 		planets[0] = new Planet(700,-80);
-		theSun = new Sun(0,0);
-		
-		//varWindow = new VariableChanger();
-		
+		theSun = new Sun(0,0);				
 	}
 
 	public void update()
@@ -101,7 +88,7 @@ public class Level
 			player.rotY +=(player.goalRotationY-player.rotY)*0.05;
 		}
 
-		if (Mouse.isButtonDown(0) && player.gunRecharge>=30)
+		if (Mouse.isButtonDown(0) && player.gunRecharge>=5)
 		{
 			//FIRE!
 			Bullet newB = new Bullet(player.gunType,player.X,player.Y,player.rotX,player.rotY);
@@ -118,7 +105,7 @@ public class Level
 				player.speedX += player.rotX*0.08f;
 				player.speedY -= player.rotY*0.08f;
 			}
-		}
+		}/*
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
 		{
 			player.Y +=1;
@@ -134,24 +121,42 @@ public class Level
 		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 		{
 			player.X +=1;
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_C)) // Do collision checking
+		}*/
+		if (Keyboard.isKeyDown(Keyboard.KEY_E)) // Do collision checking
 		{
-			for ( int e =0;e<numEnemies;e++)
+			if (enemies.size()<40)
 			{
-				
-				if (player.checkCollision(enemies[e]) == true)
-				{
-					System.out.println("Collision");
-					player.speedX = - player.speedX*0.4f;
-					player.speedY = - player.speedY*0.4f;
-				}
+				Enemy a = Enemy.newEnemy(0);
+				a.X = (float) (Math.random()*400);
+				a.Y = (float) (Math.random()*500);
+				enemies.add(a);
 			}
 		}
 		
 
 		player.X+=player.speedX;
 		player.Y+=player.speedY;
+		if (player.X > 2000)
+		{
+			player.speedX = -player.speedX;
+			player.X = 1999;
+		}
+		if (player.X<-2000)
+		{
+			player.speedX = -player.speedX;
+			player.X = -1999;
+		}
+		
+		if (player.Y > 2000)
+		{
+			player.speedY = -player.speedY;
+			player.Y = 1999;
+		}
+		if (player.Y<-2000)
+		{
+			player.speedY = -player.speedY;
+			player.Y = -1999;
+		}
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) )
 		{
@@ -201,7 +206,7 @@ public class Level
 		
 		//Do the influence of the planets
 		
-		/*for (int i = 0;i<1;i++)
+		for (int i = 0;i<1;i++)
 		{
 			float planetDist = JAsteroidsUtil.distance(player.X-planets[i].x,player.Y-planets[i].y);
 			
@@ -225,7 +230,7 @@ public class Level
 			
 			player.speedX -= (float) (Math.sin(angle)*planetInfluence*F);
 			player.speedY -= (float) (Math.cos(angle)*planetInfluence*F);
-		}*/
+		}
 		
 		//Update Bullets
 		for (int i = 0 ; i < bullets.size();i++)
@@ -236,6 +241,11 @@ public class Level
 			}
 		}
 		
+		//Update Enemies
+		for (int e = 0;e<enemies.size();e++)
+		{
+			enemies.get(e).update();
+		}
 		
 		
 		//Update planets
@@ -253,7 +263,7 @@ public class Level
 		}
 		//Display.setTitle("BoosterLeft :"+BoosterLeft);
 		
-		if (player.gunRecharge<30)
+		if (player.gunRecharge<5)
 		{
 			player.gunRecharge++;
 		}
@@ -266,16 +276,33 @@ public class Level
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		//Player with enemies
-		/*for ( int e =0;e<numEnemies;e++)
+		for ( int e =0;e<enemies.size();e++)
 		{
+			Enemy CurrEnemy = enemies.get(e);
 			
-			if (player.checkCollision(enemies[e]) == true)
+			if (player.checkCollision(CurrEnemy) == true)
 			{
-				System.out.println("Collision");
 				player.speedX = - player.speedX*0.4f;
 				player.speedY = - player.speedY*0.4f;
 			}
-		}*/
+			
+			for (int b = 0;b<bullets.size();b++)
+			{
+				if (CurrEnemy.checkCollision(bullets.get(b)) == true)
+				{
+					CurrEnemy.health-=10;
+					bullets.remove(b);
+					
+					if (CurrEnemy.health <= 0)
+					{
+						//TODO:
+						//Add action for when enemy is dead
+						enemies.remove(e);
+						score+=10;
+					}
+				}
+			}
+		}
 		
 	}
 	
@@ -296,7 +323,7 @@ public class Level
 		int cornerY = (int) (player.Y - 300);
 		
 		
-		Display.setTitle("X : "+cornerX +"\tY :" + cornerY + "\trotX"+player.rotX+"\trotY"+player.rotY);
+		Display.setTitle("Score "+score+"\tEnemies Left "+enemies.size());
 		
 		/*
 		 * First render the background. To do this, calculate how much of each tile is sticking out 
@@ -351,9 +378,12 @@ public class Level
 		
 		
 		//Render Enemies
-		for (int i = 0; i<numEnemies; i++)
+		for (int e = 0; e<enemies.size(); e++)
 		{
-			enemies[i].render(cornerX,cornerY);
+			if (enemies.get(e).health > 0)
+			{
+				enemies.get(e).render(cornerX,cornerY);
+			}
 		}
 		
 		//Render PLayer		

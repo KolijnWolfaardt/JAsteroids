@@ -3,32 +3,30 @@ package com.JAsteroids.LevelStuff;
 import org.lwjgl.opengl.GL11;
 
 import com.JAsteroids.TextureManager;
+import com.JAsteroids.Vector2f;
 
 public class Bullet extends MoveableObject
 {
 	public int bulletTexNum = 0;
 	
-	public float X;
-	public float Y;
-	public float rotX = 1.0f;
-	public float rotY = 0.0f;
-	public float speedX = 0;
-	public float speedY = 0;
-	
-	int boundingW = 30;
-	int boundingH = 10;
-	
-	public float baseSpeed = 3.0f;
+	public float baseSpeed = 8.0f;
 	
 	public boolean gravity = false; //Affected by gravity
 	public float distance = 0;
 	
 	public Bullet()
 	{
+		
 	}
 	
 	public Bullet(int bulletType,float x, float y, float rotx, float roty)
 	{
+		collisionPoints = new Vector2f[4];
+		collisionPoints[0] = new Vector2f(-19,-22);
+		collisionPoints[1] = new Vector2f(18,-22);
+		collisionPoints[2] = new Vector2f(18,20);
+		collisionPoints[3] = new Vector2f(-19,20);
+		
 		bulletTexNum=bulletType;
 		
 		X = x;
