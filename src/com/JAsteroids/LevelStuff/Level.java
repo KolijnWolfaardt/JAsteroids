@@ -88,7 +88,7 @@ public class Level
 			player.rotY +=(player.goalRotationY-player.rotY)*0.05;
 		}
 
-		if (Mouse.isButtonDown(0) && player.gunRecharge>=5)
+		if (Mouse.isButtonDown(0) && player.gunRecharge>=10)
 		{
 			//FIRE!
 			Bullet newB = new Bullet(player.gunType,player.X,player.Y,player.rotX,player.rotY);
@@ -117,11 +117,12 @@ public class Level
 		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 		{
 			player.X -=1;
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
-		{
-			player.X +=1;
 		}*/
+		if (Keyboard.isKeyDown(Keyboard.KEY_M))
+		{
+			enemies.get(0).targetX =player.X;
+			enemies.get(0).targetY = player.Y;
+		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_E)) // Do collision checking
 		{
 			if (enemies.size()<40)
@@ -205,7 +206,7 @@ public class Level
 		
 		
 		//Do the influence of the planets
-		
+		/*
 		for (int i = 0;i<1;i++)
 		{
 			float planetDist = JAsteroidsUtil.distance(player.X-planets[i].x,player.Y-planets[i].y);
@@ -231,7 +232,7 @@ public class Level
 			player.speedX -= (float) (Math.sin(angle)*planetInfluence*F);
 			player.speedY -= (float) (Math.cos(angle)*planetInfluence*F);
 		}
-		
+		*/
 		//Update Bullets
 		for (int i = 0 ; i < bullets.size();i++)
 		{
@@ -263,7 +264,7 @@ public class Level
 		}
 		//Display.setTitle("BoosterLeft :"+BoosterLeft);
 		
-		if (player.gunRecharge<5)
+		if (player.gunRecharge<50)
 		{
 			player.gunRecharge++;
 		}
@@ -323,7 +324,7 @@ public class Level
 		int cornerY = (int) (player.Y - 300);
 		
 		
-		Display.setTitle("Score "+score+"\tEnemies Left "+enemies.size());
+		//Display.setTitle("Score "+score+"\tEnemies Left "+enemies.size());
 		
 		/*
 		 * First render the background. To do this, calculate how much of each tile is sticking out 

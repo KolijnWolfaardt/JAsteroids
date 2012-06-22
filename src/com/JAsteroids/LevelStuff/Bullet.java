@@ -60,7 +60,7 @@ public class Bullet extends MoveableObject
 
 		GL11.glPushMatrix();
 		GL11.glTranslatef((X-xpos), (Y-ypos), 0);
-		GL11.glRotatef((float) Math.toDegrees(Math.atan2(rotX,rotY)), 0f, 0f, 1f);
+		GL11.glRotatef((float) Math.toDegrees(Math.atan2(rotY,rotX)), 0f, 0f, -1f);
 		GL11.glTranslatef(-(X-xpos), -(Y-ypos), 0);
 		
 			
@@ -80,18 +80,6 @@ public class Bullet extends MoveableObject
 			GL11.glVertex2f((X-xpos)-width, (Y-ypos)+height);
 				
 			GL11.glEnd();	
-		
-			//Draw the bounding box if enabled
-			GL11.glColor3f(1.0f, 0.5f, 0.5f);
-			
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glVertex2f(100.0f, 100.0f);
-			GL11.glVertex2f(100.0f, 10.0f);
-			GL11.glVertex2f(125.0f, 50.0f);
-			GL11.glVertex2f(125.0f, 10.0f);
-			GL11.glEnd( );
-			
-			GL11.glColor3f(1.0f, 1.0f, 1.0f);
 		    
 		GL11.glPopMatrix();
 		

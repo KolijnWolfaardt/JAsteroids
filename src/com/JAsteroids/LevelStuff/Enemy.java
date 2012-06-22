@@ -1,5 +1,6 @@
 package com.JAsteroids.LevelStuff;
 
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import com.JAsteroids.JAsteroidsUtil;
@@ -38,14 +39,26 @@ public class Enemy extends MoveableObject
 			{
 				targetY = (float) (targetY+(Math.random()-0.5)*1000);
 			}
-			while (targetY > 2000 | targetY <-2000);
+			while (targetY >2000 | targetY <-2000);
 		}
 		
-		float targetRotX = X-targetX;
-		float targetRotY = Y-targetY;
-		float size = JAsteroidsUtil.distance(targetRotX, targetRotY);
-		targetRotX = targetRotX/size;
-		targetRotY = targetRotY/size;
+		float targetRotation 	= (float) Math.atan2(Y-targetY,X-targetX);
+		float currRotation 	 	= (float) Math.atan2(rotY,rotX);
+		float delta					= currRotation-targetRotation;
+		
+		if (delta > 0.05)
+		{
+			delta = 0.05f;
+		}
+		if (delta < -0.05)
+		{
+			delta = -0.05f;
+		}
+		Display.setTitle("target: "+targetRotation+"\trotX :"+rotX+"\trotY"+rotY);
+		
+
+		rotX = (float) Math.cos(currRotation-delta);
+		rotY = (float) Math.sin(currRotation-delta);
 		
 		X = X+speedX;
 		Y = Y+speedY;
@@ -65,6 +78,7 @@ public class Enemy extends MoveableObject
 				speedY=maxSpeed;
 			if (speedY<-maxSpeed)
 				speedY=-maxSpeed;
+			
 		}
 		
 		return 0;
@@ -74,6 +88,12 @@ public class Enemy extends MoveableObject
 	{
 		TextureManager.enemies[textureID].bind();
 		//Draw a quad in the center of the screen
+		
+		
+		GL11.glPushMatrix();
+		GL11.glTranslatef((X-xpos), (Y-ypos), 0);
+		GL11.glRotatef((float) Math.toDegrees(Math.atan2(rotY,rotX)), 0f, 0f, 1f);
+		GL11.glTranslatef(-(X-xpos), -(Y-ypos), 0);			
 		
 		GL11.glBegin(GL11.GL_QUADS);
 				
@@ -89,7 +109,9 @@ public class Enemy extends MoveableObject
 			GL11.glTexCoord2f(0.0f,TextureManager.enemies[textureID].getHeight());
 			GL11.glVertex2f((X-xpos)-width,(Y-ypos)+height);
 				
-		GL11.glEnd();	
+		GL11.glEnd();
+		
+		GL11.glPopMatrix();
 	}
 	
 	public static Enemy newEnemy(int enemyType)
